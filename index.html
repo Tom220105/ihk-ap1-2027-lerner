@@ -208,7 +208,7 @@ code{font-family:var(--f-mono);font-size:.92em}
 .f-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
 .f-card{padding:18px;display:flex;flex-direction:column;gap:10px}
 .f-card h3{font-size:1.05rem}
-.f{font-family:var(--f-mono);font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 10px;overflow-x:auto;white-space:nowrap}
+.f{font-family:var(--f-mono);font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 10px;overflow-wrap:anywhere}
 .f-card p,.f-card li{font-size:.9rem}
 .f-card ul{margin:0;padding-left:1.1em}
 .schema{font-family:var(--f-mono);font-size:.82rem;display:grid;grid-template-columns:1.6em minmax(0,1fr);gap:2px 6px}
@@ -225,6 +225,7 @@ code{font-family:var(--f-mono);font-size:.92em}
   .result{grid-template-columns:1fr}
   .q{padding:16px}
   .brand span{display:none}
+  .tab{padding:8px 9px 9px}
 }
 @media (prefers-reduced-motion:no-preference){
   .fb{animation:pop .18s ease-out}
@@ -334,9 +335,9 @@ function stats(ids){
   return {n: ids.length, seen, mastered, due, pct: ids.length ? Math.round(score / ids.length * 100) : 0, seenPct: ids.length ? Math.round(seen / ids.length * 100) : 0};
 }
 function daysLeft(){
-  const d = new Date(S.examDate + "T08:00:00"); if (isNaN(d)) return null;
+  const d = new Date(S.examDate + "T00:00:00"); if (isNaN(d)) return null;
   const today = new Date(); today.setHours(0,0,0,0);
-  return Math.ceil((d - today) / DAY);
+  return Math.round((d - today) / DAY);
 }
 function parseNum(s){
   s = String(s == null ? "" : s).trim().replace(/[€%\s]/g, "").replace(/[A-Za-zäöüÄÖÜ\/]+$/, "");
@@ -506,11 +507,11 @@ function qCard(q, sel, phase, ctx){
   return h + "</article>";
 }
 function vSummary(){
-  const s = S.session, ids = s.ids;
+  const s = S.session, ids = s.ids.filter(id => s.res[id] != null);
   const right = ids.filter(id => s.res[id] === "ok").length;
   const wrong = ids.filter(id => s.res[id] !== "ok");
   let h = '<div class="stack"><section class="card result"><div><p class="eyebrow">Runde geschafft</p><p class="score" style="margin-top:6px">' + right + '<span class="muted" style="font-size:1.6rem"> / ' + ids.length + '</span></p></div>' +
-          '<div><p>' + (right === ids.length ? "Alles richtig. Diese Fragen kommen erst in ein paar Tagen wieder." : wrong.length + " Fragen sitzen noch nicht. Sie landen wieder im ersten Fach und kommen bald erneut.") + '</p>' +
+          '<div><p>' + (right === ids.length ? "Alles richtig. Diese Fragen kommen erst in ein paar Tagen wieder." : (wrong.length === 1 ? "1 Frage sitzt noch nicht. Sie landet wieder im ersten Fach und kommt bald erneut." : wrong.length + " Fragen sitzen noch nicht. Sie landen wieder im ersten Fach und kommen bald erneut.")) + '</p>' +
           '<div class="btn-row" style="margin-top:14px">' + (wrong.length ? '<button class="btn primary" data-act="again-wrong">Falsche nochmal (' + wrong.length + ')</button>' : "") +
           '<button class="btn" data-act="new-round">Neue Runde</button><button class="btn ghost" data-act="go-home">Zur Übersicht</button></div></div></section>';
   if (wrong.length) h += '<section class="card review">' + wrong.map(id => { const q = BY[id]; return '<details><summary><span class="mark ' + (s.res[id] === "part" ? "part" : "bad") + '">' + (s.res[id] === "part" ? "½" : "✗") + '</span><span>' + esc(strip(q.q).slice(0, 140)) + '</span></summary><div class="body"><p>' + solutionLine(q) + '</p><div class="expl">' + (q.y === "open" ? q.a : q.e || "") + '</div></div></details>'; }).join("") + '</section>';
@@ -614,7 +615,7 @@ function submitExam(){
 }
 function finishExam(){
   const ex = S.exam; ex.phase = "done";
-  for (const id of ex.ids) { const p = examPoints(id); record(id, p === 4 ? "ok" : p > 0 ? "part" : "bad"); }
+  for (const id of ex.ids) { if (!hasAnswer(BY[id], ex.ans[id])) continue; const p = examPoints(id); record(id, p === 4 ? "ok" : p > 0 ? "part" : "bad"); }
   render(); window.scrollTo({top: 0});
 }
 
@@ -685,7 +686,7 @@ const ACT = {
   reveal: () => { const s = S.session; const inp = $("#ans"); if (inp) s.sel = inp.value; s.phase = "shown"; render(); },
   rate: d => { const s = S.session, id = s.ids[s.i]; s.res[id] = d.r; record(id, d.r); ACT.next(); },
   next: () => { const s = S.session; if (!s) return; s.i++; s.sel = null; s.phase = "ask"; s.ok = null; render(); window.scrollTo({top: 0}); },
-  "again-wrong": () => { const s = S.session; const ids = s.ids.filter(id => s.res[id] !== "ok"); startSession(shuffle(ids), s.mode, s.label + " · Wiederholung"); },
+  "again-wrong": () => { const s = S.session; const ids = s.ids.filter(id => s.res[id] != null && s.res[id] !== "ok"); startSession(shuffle(ids), s.mode, s.label + " · Wiederholung"); },
   "new-round": () => { const m = S.session.mode; S.session = null; if (m === "review") go("wiederholen"); else ACT.start({n: "10"}); },
   reset: () => { S.resetArm = true; render(); },
   "reset-no": () => { S.resetArm = false; render(); },
@@ -740,6 +741,8 @@ document.addEventListener("keydown", e => {
     else if (q.y !== "open") ACT.next();
   }
 });
+
+window.addEventListener("hashchange", () => { const v = (location.hash || "").slice(1); if (VIEWS.includes(v) && v !== S.view) go(v); });
 
 /* ───────── Start ───────── */
 loadLocal();
