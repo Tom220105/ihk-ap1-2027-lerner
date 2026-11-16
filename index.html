@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Lern-App für Teil 1 der IHK-Abschlussprüfung (IT-Berufe) 2027: 248 Aufgaben zu LF01–LF06, Karteikasten, Prüfungssimulation und Formelsammlung.">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>IHK AP1 2027 Lerner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: Prüfungsbogen – Kopfzeile wie ein Klausurdeckblatt, eine ruhige Lesespalte, der Textmarker ist der einzige laute Akzent */
+:root{
+  --paper:#F2F4F8; --card:#FFFFFF; --ink:#131A2B; --muted:#586176; --line:#D7DCE6; --soft:#E9EDF5;
+  --accent:#2341C4; --on-accent:#FFFFFF; --hl:#FFE04A; --hl-soft:#FFF5BF;
+  --ok:#11784A; --ok-bg:#E2F3EA; --bad:#B02E2E; --bad-bg:#FBE7E7; --warn:#8F5A00; --warn-bg:#FFF1D6;
+  --shadow:0 1px 0 rgba(19,26,43,.04), 0 10px 28px -18px rgba(19,26,43,.35);
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D1119; --card:#151B26; --ink:#E5E9F1; --muted:#9AA3B5; --line:#283042; --soft:#1C2331;
+    --accent:#94A7FF; --on-accent:#0D1119; --hl:#5C4D0E; --hl-soft:#2E2A12;
+    --ok:#5BCB92; --ok-bg:#12291E; --bad:#FF8A8A; --bad-bg:#2F1818; --warn:#F2B75B; --warn-bg:#2D2412;
+    --shadow:0 1px 0 rgba(0,0,0,.3), 0 10px 28px -16px rgba(0,0,0,.8);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D1119; --card:#151B26; --ink:#E5E9F1; --muted:#9AA3B5; --line:#283042; --soft:#1C2331;
+  --accent:#94A7FF; --on-accent:#0D1119; --hl:#5C4D0E; --hl-soft:#2E2A12;
+  --ok:#5BCB92; --ok-bg:#12291E; --bad:#FF8A8A; --bad-bg:#2F1818; --warn:#F2B75B; --warn-bg:#2D2412;
+  --shadow:0 1px 0 rgba(0,0,0,.3), 0 10px 28px -16px rgba(0,0,0,.8);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--card)}
+.wrap{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+h2{font-size:1.45rem;font-weight:800;letter-spacing:-.01em}
+h3{font-size:1.1rem;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.hl{background:linear-gradient(transparent 52%,var(--hl) 52%,var(--hl) 90%,transparent 90%);padding:0 .08em}
+.eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* Kopf */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px 8px}
+.brand{display:flex;align-items:baseline;gap:10px;min-width:0}
+.brand b{font-family:var(--f-display);font-weight:800;font-size:1.5rem;letter-spacing:-.02em}
+.brand span{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);white-space:nowrap}
+.chip-count{font-family:var(--f-mono);font-size:.8rem;padding:4px 10px;border:1.5px solid var(--ink);border-radius:999px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.chip-count.live{border-color:var(--bad);color:var(--bad)}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:8px 12px 9px;cursor:pointer;color:var(--muted);font-weight:700;white-space:nowrap}
+.tab[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink)}
+.tab .badge{display:inline-block;min-width:1.4em;margin-left:6px;padding:0 6px;border-radius:999px;background:var(--hl);color:var(--ink);font-family:var(--f-mono);font-size:.72rem;line-height:1.5;text-align:center}
+
+main{padding-block:24px 64px}
+.stack{display:flex;flex-direction:column;gap:28px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:8px;border:1.5px solid var(--ink);background:var(--card);cursor:pointer;font-weight:700;text-decoration:none;color:var(--ink);min-height:44px}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.btn.primary:hover{opacity:.9}
+.btn.ghost{border-color:var(--line)}
+.btn.small{padding:6px 12px;min-height:36px;font-size:.9rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:.9rem;color:var(--ink)}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.chip .n{font-family:var(--f-mono);font-size:.75rem;opacity:.7}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Übersicht */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 28px;align-items:end;padding:24px}
+.hero h1{font-size:clamp(1.9rem,5vw,3rem);font-weight:800;letter-spacing:-.02em}
+.hero .days{font-family:var(--f-display);font-weight:800;font-variant-numeric:tabular-nums}
+.facts{margin-top:10px;color:var(--muted);max-width:60ch}
+.date-box{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--muted)}
+.date-box input{font:inherit;font-family:var(--f-mono);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:44px}
+.hero .note{grid-column:1/-1;font-size:.85rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:12px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stat{padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.stat .v{font-family:var(--f-display);font-size:1.8rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat .l{font-size:.85rem;color:var(--muted)}
+.stat.due{background:var(--hl-soft);border-color:var(--hl)}
+.lf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.lf{padding:16px;display:flex;flex-direction:column;gap:10px}
+.lf-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lf-no{font-family:var(--f-mono);font-size:.78rem;font-weight:600;letter-spacing:.06em;padding:2px 8px;border-radius:4px;background:var(--ink);color:var(--card)}
+.lf-head a{font-size:.82rem;text-decoration:none}
+.lf-head a:hover{text-decoration:underline}
+.meter{height:10px;border-radius:999px;background:var(--soft);overflow:hidden;position:relative}
+.meter span{position:absolute;inset:0 auto 0 0;background:var(--ink);border-radius:999px}
+.meter .seen{background:var(--line)}
+.lf-meta{font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.lf .chips{gap:6px}
+.lf .chip{font-size:.8rem;padding:4px 10px}
+.weak{display:flex;flex-direction:column}
+.weak-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--line)}
+.weak-row:first-child{border-top:0}
+.weak-row .rate{font-family:var(--f-mono);font-size:.85rem;color:var(--bad)}
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.foot{font-size:.85rem;color:var(--muted);display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:16px}
+.sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--muted);margin-right:6px;vertical-align:middle}
+.sync-dot.cloud{background:var(--ok)}
+
+/* Frage */
+.sess-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bar{height:6px;background:var(--soft);border-radius:999px;overflow:hidden;margin-top:10px}
+.bar span{display:block;height:100%;background:var(--ink)}
+.q{padding:22px;display:flex;flex-direction:column;gap:18px}
+.q-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.85rem;color:var(--muted)}
+.tag{font-family:var(--f-mono);font-size:.75rem;font-weight:600;padding:2px 8px;border-radius:4px;border:1px solid var(--ink);color:var(--ink)}
+.q-text{font-size:1.12rem;line-height:1.55;max-width:68ch}
+.q-text pre,.expl pre{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto;font-size:.9rem;margin:10px 0 0}
+code{font-family:var(--f-mono);font-size:.92em}
+.hint{font-size:.85rem;color:var(--muted)}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;padding:12px 14px;border-radius:8px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;line-height:1.45}
+.opt:hover{border-color:var(--ink)}
+.opt .key{flex:none;width:28px;height:28px;border-radius:6px;display:grid;place-items:center;font-family:var(--f-mono);font-size:.8rem;font-weight:600;border:1.5px solid var(--line);background:var(--paper)}
+.opt.multi .key{border-radius:50%}
+.opt[aria-pressed="true"]{border-color:var(--ink);background:var(--soft)}
+.opt[aria-pressed="true"] .key{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.opt.is-right{border-color:var(--ok);background:var(--ok-bg)}
+.opt.is-right .key{background:var(--ok);color:var(--card);border-color:var(--ok)}
+.opt.is-wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opt.is-wrong .key{background:var(--bad);color:var(--card);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.opt span:last-child{min-width:0}
+.field{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.field input,.field textarea{font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;min-height:46px}
+.field input{font-family:var(--f-mono);font-size:1.1rem;width:min(260px,100%)}
+.field textarea{width:100%;min-height:120px;resize:vertical;font-family:var(--f-body)}
+.field input:focus,.field textarea:focus{border-color:var(--ink);outline:none}
+.unit{font-family:var(--f-mono);color:var(--muted)}
+.fb{border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;border:1.5px solid}
+.fb.ok{background:var(--ok-bg);border-color:var(--ok)}
+.fb.bad{background:var(--bad-bg);border-color:var(--bad)}
+.fb.info{background:var(--hl-soft);border-color:var(--hl)}
+.fb-title{font-weight:700;display:flex;gap:8px;align-items:center}
+.fb.ok .fb-title{color:var(--ok)}
+.fb.bad .fb-title{color:var(--bad)}
+.expl{line-height:1.6}
+.expl ul,.expl ol{margin:6px 0 0;padding-left:1.2em}
+.expl li{margin:3px 0}
+.q-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.kbd{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
+
+/* Picker */
+.picker{padding:20px;display:flex;flex-direction:column;gap:16px}
+.picker .lbl{font-size:.8rem;color:var(--muted);margin-bottom:6px}
+
+/* Karteikasten */
+.boxes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.box{padding:12px 10px;text-align:center;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.box .v{font-family:var(--f-display);font-weight:800;font-size:1.4rem;font-variant-numeric:tabular-nums}
+.box .l{font-size:.75rem;color:var(--muted)}
+.box.fill{background:var(--soft)}
+
+/* Prüfung */
+.exam-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px}
+.timer{font-family:var(--f-mono);font-size:1.4rem;font-weight:600;font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad)}
+.dots{display:flex;flex-wrap:wrap;gap:6px}
+.dot{width:34px;height:34px;border-radius:6px;border:1.5px solid var(--line);background:var(--card);font-family:var(--f-mono);font-size:.78rem;cursor:pointer;color:var(--ink)}
+.dot.done{background:var(--soft);border-color:var(--muted)}
+.dot.cur{border-color:var(--ink);background:var(--ink);color:var(--card)}
+.grade-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.grade-table th,.grade-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);font-size:.92rem}
+.grade-table th{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.table-wrap{overflow-x:auto}
+.result{padding:24px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 28px;align-items:center}
+.result .score{font-family:var(--f-display);font-weight:800;font-size:3.2rem;line-height:1;font-variant-numeric:tabular-nums}
+.result .note{font-family:var(--f-display);font-weight:800;font-size:1.6rem}
+.lf-bars{display:flex;flex-direction:column;gap:10px;grid-column:1/-1}
+.lf-bar{display:grid;grid-template-columns:4.5rem minmax(0,1fr) 4.5rem;gap:10px;align-items:center;font-size:.85rem}
+.lf-bar .meter{height:8px}
+.review details{border-top:1px solid var(--line);padding:12px 16px}
+.review details:first-child{border-top:0}
+.review summary{cursor:pointer;display:flex;gap:10px;align-items:baseline;list-style:none}
+.review summary::-webkit-details-marker{display:none}
+.review .mark{font-family:var(--f-mono);font-weight:600;flex:none;width:3.2rem}
+.review .mark.ok{color:var(--ok)}
+.review .mark.bad{color:var(--bad)}
+.review .mark.part{color:var(--warn)}
+.review .body{padding:10px 0 4px 3.2rem;display:flex;flex-direction:column;gap:8px}
+
+/* Formeln */
+.f-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.f-card{padding:18px;display:flex;flex-direction:column;gap:10px}
+.f-card h3{font-size:1.05rem}
+.f{font-family:var(--f-mono);font-size:.86rem;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 10px;overflow-x:auto;white-space:nowrap}
+.f-card p,.f-card li{font-size:.9rem}
+.f-card ul{margin:0;padding-left:1.1em}
+.schema{font-family:var(--f-mono);font-size:.82rem;display:grid;grid-template-columns:1.6em minmax(0,1fr);gap:2px 6px}
+.schema .op{color:var(--muted);text-align:center}
+.schema .res{font-weight:600}
+
+.empty{padding:28px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.confirm{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+@media (max-width:720px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero{grid-template-columns:1fr;padding:18px}
+  .boxes{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .result{grid-template-columns:1fr}
+  .q{padding:16px}
+  .brand span{display:none}
+}
+@media (prefers-reduced-motion:no-preference){
+  .fb{animation:pop .18s ease-out}
+  @keyframes pop{from{transform:translateY(4px);opacity:.4}to{transform:none;opacity:1}}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <div class="brand"><b>AP1 Lerner</b><span>IHK · Frühjahr 2027 · LF01–LF06</span></div>
+      <span class="chip-count" id="top-chip">…</span>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Bereiche"></nav>
+  </div>
+</header>
+<main class="wrap" id="app" aria-live="polite"></main>
+
+<script src="fragen.js"></script>
+<script>
+(function(){
+"use strict";
+const QS = window.FRAGEN || [];
+const LFS = window.LERNFELDER || {};
+const BY = {}; QS.forEach(q => BY[q.id] = q);
+const DAY = 864e5, INT = [0,1,2,4,8,16];
+const TYPE_LABEL = {mc:"Eine Antwort", multi:"Mehrere Antworten", num:"Rechnen", text:"Eingabe", open:"Offene Aufgabe"};
+const VIEWS = ["uebersicht","lernen","wiederholen","pruefung","formeln"];
+const VIEW_LABEL = {uebersicht:"Übersicht", lernen:"Lernen", wiederholen:"Wiederholen", pruefung:"Prüfung", formeln:"Formeln"};
+const LS_KEY = "ap1-lerner-v1";
+
+const S = {
+  view: "uebersicht", prog: {}, examDate: "2027-02-24", sync: "local",
+  session: null, exam: null,
+  pick: {lf: 0, topic: "", kind: "all"},
+  resetArm: false, submitArm: false
+};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = (n, d=2) => Number(n).toLocaleString("de-DE", {maximumFractionDigits: d});
+const strip = h => String(h).replace(/<pre[\s\S]*?<\/pre>/g," […]").replace(/<[^>]+>/g,"").replace(/\s+/g," ").trim();
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const box = id => S.prog[id] ? (S.prog[id].b || 0) : -1;
+const topicsOf = lf => [...new Set(QS.filter(q => q.lf === lf).map(q => q.t))];
+
+/* ───────── Speicherung: lokal sofort, Konto (db) wenn verfügbar ───────── */
+function loadLocal(){
+  try { const o = JSON.parse(localStorage.getItem(LS_KEY) || "null"); if (o) { S.prog = o.prog || {}; if (o.examDate) S.examDate = o.examDate; } } catch(e) {}
+}
+function saveLocal(){
+  try { localStorage.setItem(LS_KEY, JSON.stringify({prog: S.prog, examDate: S.examDate})); } catch(e) {}
+}
+const cloud = {ref: null, busy: false, again: false, t: null};
+function save(){ saveLocal(); if (!cloud.ref) return; clearTimeout(cloud.t); cloud.t = setTimeout(flush, 1200); }
+async function flush(){
+  if (!cloud.ref) return;
+  if (cloud.busy) { cloud.again = true; return; }
+  cloud.busy = true;
+  try { await cloud.ref.set({v: 1, examDate: S.examDate, prog: S.prog, updated: Date.now()}); setSync("cloud"); }
+  catch(e) { setSync(e && e.code === "unavailable" ? "cloud" : "error"); if (e && e.code === "unavailable") setTimeout(flush, 2000 + Math.random() * 2000); }
+  finally { cloud.busy = false; if (cloud.again) { cloud.again = false; flush(); } }
+}
+function setSync(s){ S.sync = s; const el = $("#sync-line"); if (el) el.innerHTML = syncText(); }
+function syncText(){
+  if (S.sync === "cloud") return '<span class="sync-dot cloud"></span>Dein Fortschritt wird in deinem Claude-Konto gespeichert und ist auf jedem Gerät verfügbar.';
+  if (S.sync === "error") return '<span class="sync-dot"></span>Speichern im Konto hat gerade nicht geklappt. Dein Fortschritt ist in diesem Browser gesichert.';
+  return '<span class="sync-dot"></span>Dein Fortschritt wird in diesem Browser gespeichert.';
+}
+async function initCloud(){
+  const use = n => (window.claude && typeof window.claude.use === "function") ? window.claude.use(n) : Promise.resolve(null);
+  try {
+    const [db, user] = await Promise.all([use("db"), use("user")]);
+    if (!db || !user) return;
+    const uid = await user.id();
+    if (!uid) return;
+    const ref = db.doc("data/users/" + uid + "/progress");
+    const snap = await Promise.race([ref.get(), new Promise((_, rej) => setTimeout(() => rej({code: "timeout"}), 10000))]);
+    let push = false;
+    if (snap.exists) {
+      const d = snap.data() || {}; const rp = d.prog || {};
+      for (const k of Object.keys(rp)) { const l = S.prog[k], r = rp[k]; if (!l || (r.l || 0) > (l.l || 0)) S.prog[k] = Object.assign({}, r); }
+      for (const k of Object.keys(S.prog)) if (!rp[k] || (S.prog[k].l || 0) > (rp[k].l || 0)) push = true;
+      if (d.examDate) S.examDate = d.examDate;
+    } else if (Object.keys(S.prog).length) push = true;
+    cloud.ref = ref; S.sync = "cloud"; saveLocal();
+    if (!S.session && !S.exam) render(); else { renderTop(); setSync("cloud"); }
+    if (push) save();
+  } catch(e) { /* bleibt lokal */ }
+}
+
+/* ───────── Lernlogik (Karteikasten) ───────── */
+function record(id, res){
+  const e = Object.assign({b: 0, c: 0, w: 0}, S.prog[id] || {});
+  if (res === "ok") { e.b = Math.min(5, (e.b || 0) + 1); e.c++; }
+  else if (res === "part") { e.b = Math.max(1, Math.min(e.b || 0, 2)); }
+  else { e.b = 0; e.w++; }
+  e.l = Date.now();
+  e.d = res === "bad" ? e.l + 10 * 60 * 1000 : e.l + INT[e.b] * DAY;
+  S.prog[id] = e; save();
+}
+const dueIds = () => { const t = Date.now(); return QS.filter(q => S.prog[q.id] && S.prog[q.id].d <= t).map(q => q.id); };
+function stats(ids){
+  let seen = 0, mastered = 0, score = 0; const t = Date.now(); let due = 0;
+  for (const id of ids) { const e = S.prog[id]; if (e) { seen++; if (e.b >= 3) mastered++; score += Math.min(e.b, 4) / 4; if (e.d <= t) due++; } }
+  return {n: ids.length, seen, mastered, due, pct: ids.length ? Math.round(score / ids.length * 100) : 0, seenPct: ids.length ? Math.round(seen / ids.length * 100) : 0};
+}
+function daysLeft(){
+  const d = new Date(S.examDate + "T08:00:00"); if (isNaN(d)) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.ceil((d - today) / DAY);
+}
+function parseNum(s){
+  s = String(s == null ? "" : s).trim().replace(/[€%\s]/g, "").replace(/[A-Za-zäöüÄÖÜ\/]+$/, "");
+  if (!s) return NaN;
+  if (s.includes(",") && s.includes(".")) s = s.replace(/\./g, "").replace(",", ".");
+  else if (s.includes(",")) s = s.replace(",", ".");
+  else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
+  return parseFloat(s);
+}
+function hasAnswer(q, a){
+  if (q.y === "mc") return Number.isInteger(a);
+  if (q.y === "multi") return Array.isArray(a) && a.length > 0;
+  return a != null && String(a).trim() !== "";
+}
+function isCorrect(q, a){
+  if (!hasAnswer(q, a)) return false;
+  if (q.y === "mc") return a === q.a;
+  if (q.y === "multi") return a.slice().sort().join() === q.a.slice().sort().join();
+  if (q.y === "num") { const v = parseNum(a); const tol = q.tol == null ? 0.011 : q.tol; return !isNaN(v) && Math.abs(v - q.a) <= tol + 1e-9; }
+  if (q.y === "text") { const n = x => String(x).toLowerCase().replace(/\s+/g, ""); return q.a.some(x => n(x) === n(a)); }
+  return false;
+}
+function solutionLine(q){
+  if (q.y === "num") return "Lösung: <b class=\"mono\">" + fmt(q.a) + (q.u ? " " + esc(q.u) : "") + "</b>";
+  if (q.y === "text") return "Lösung: <b class=\"mono\">" + esc(q.a[0]) + "</b>";
+  if (q.y === "mc") return "Richtig: <b>" + "ABCDEF"[q.a] + "</b>";
+  if (q.y === "multi") return "Richtig: <b>" + q.a.map(i => "ABCDEF"[i]).join(", ") + "</b>";
+  return "";
+}
+
+/* ───────── Rendering ───────── */
+function renderTop(){
+  const d = daysLeft();
+  const chip = $("#top-chip");
+  if (S.exam && S.exam.phase === "run") { chip.className = "chip-count live"; chip.id = "top-chip"; chip.textContent = "Prüfung läuft"; }
+  else { chip.className = "chip-count"; chip.textContent = d == null ? "Termin?" : d > 0 ? "noch " + d + " Tage" : d === 0 ? "heute AP1" : "AP1 vorbei"; }
+  const due = dueIds().length;
+  $("#tabs").innerHTML = VIEWS.map(v => '<button class="tab" data-act="go" data-v="' + v + '"' + (S.view === v ? ' aria-current="page"' : "") + ">" + VIEW_LABEL[v] + (v === "wiederholen" && due ? '<span class="badge">' + due + "</span>" : "") + "</button>").join("");
+}
+function render(){
+  renderTop();
+  const fn = {uebersicht: vUebersicht, lernen: vLernen, wiederholen: vWiederholen, pruefung: vPruefung, formeln: vFormeln}[S.view];
+  $("#app").innerHTML = fn();
+  const inp = $("#ans");
+  if (inp && document.activeElement !== inp && !matchMedia("(pointer:coarse)").matches) inp.focus({preventScroll: true});
+}
+function go(v){
+  if (!VIEWS.includes(v)) v = "uebersicht";
+  S.view = v; S.resetArm = false;
+  try { history.replaceState(null, "", "#" + v); } catch(e) {}
+  render(); window.scrollTo({top: 0});
+}
+
+function vUebersicht(){
+  const d = daysLeft();
+  const all = QS.map(q => q.id), st = stats(all), due = dueIds().length;
+  const unseen = st.n - st.seen;
+  const perDay = d && d > 0 ? Math.max(1, Math.ceil(unseen / Math.max(1, d - 14))) : unseen;
+  const headline = d == null ? "Prüfungstermin eintragen"
+    : d > 1 ? '<span class="days">' + d + '</span> Tage bis zur <span class="hl">AP1</span>'
+    : d === 1 ? 'Morgen ist <span class="hl">AP1</span>' : d === 0 ? 'Heute ist <span class="hl">AP1</span>. Viel Erfolg!' : 'Die <span class="hl">AP1</span> liegt hinter dir';
+  let h = '<div class="stack">';
+  h += '<section class="card hero"><div><p class="eyebrow">Abschlussprüfung Teil 1 · IT-Berufe</p><h1 style="margin-top:8px">' + headline + '</h1>' +
+       '<p class="facts">Prüfungsbereich „Einrichten eines IT-gestützten Arbeitsplatzes“: schriftlich, 90 Minuten, zählt 20 % zur Gesamtnote. Erlaubt ist ein nicht programmierbarer Taschenrechner.</p></div>' +
+       '<label class="date-box" for="exam-date">Dein Prüfungstermin<input type="date" id="exam-date" value="' + esc(S.examDate) + '"></label>' +
+       '<p class="note">Voreingestellt ist der 24.02.2027, der bundesweite Frühjahrstermin für Teil 1 der IT-Berufe (veröffentlicht u. a. von IHK Berlin und IHK Köln). Prüfe das Datum in deiner Einladung der IHK Hannover.</p></section>';
+  h += '<section class="stats">' +
+       stat(st.seen + '<span class="muted" style="font-size:1rem"> / ' + st.n + '</span>', "Fragen bearbeitet") +
+       stat(st.mastered, "sicher gekonnt (3× richtig)") +
+       '<button class="card stat due" data-act="go" data-v="wiederholen" style="text-align:left;cursor:pointer"><span class="v">' + due + '</span><span class="l">heute fällig → wiederholen</span></button>' +
+       stat(unseen ? perDay : "✓", unseen ? "neue Fragen pro Tag schaffen alles" : "alle Fragen gesehen") +
+       '</section>';
+  h += '<section><div class="section-head"><h2>Lernfelder</h2><span class="muted" style="font-size:.85rem">Balken: dunkel = sicher, grau = schon gesehen</span></div><div class="lf-grid">';
+  for (const n of [1,2,3,4,5,6]) {
+    const ids = QS.filter(q => q.lf === n).map(q => q.id), s = stats(ids), L = LFS[n] || {};
+    h += '<article class="card lf"><div class="lf-head"><span class="lf-no">LF 0' + n + '</span>' + (L.moodle ? '<a href="' + esc(L.moodle) + '" target="_blank" rel="noopener">Moodle-Kurs ↗</a>' : "") + '</div>' +
+         '<h3>' + esc(L.titel || L.kurz || "") + '</h3>' +
+         '<div class="meter" role="img" aria-label="' + s.pct + ' Prozent sicher"><span class="seen" style="width:' + s.seenPct + '%"></span><span style="width:' + s.pct + '%"></span></div>' +
+         '<p class="lf-meta">' + s.pct + ' % sicher · ' + s.seen + '/' + s.n + ' gesehen' + (s.due ? ' · <b>' + s.due + ' fällig</b>' : "") + '</p>' +
+         '<div class="chips">' + topicsOf(n).map(t => '<button class="chip" data-act="quick" data-lf="' + n + '" data-t="' + esc(t) + '">' + esc(t) + '</button>').join("") + '</div>' +
+         '<div class="btn-row"><button class="btn primary small" data-act="quick" data-lf="' + n + '">10 Fragen üben</button></div></article>';
+  }
+  h += '</div></section>';
+  h += '<section><div class="section-head"><h2>Hier hakt es noch</h2></div>' + weakList() + '</section>';
+  h += '<section class="foot"><p id="sync-line">' + syncText() + '</p>' +
+       '<p>Die Inhalte orientieren sich an deinen Moodle-Kursen LF01–LF06 (MMBbS Hannover) und wurden mit Gesetzestexten und IHK-Angaben abgeglichen. Es sind eigene Übungsaufgaben, keine Original-IHK-Aufgaben. Echte Altklausuren findest du im Moodle-Kurs LF06.</p>' +
+       '<div>' + (S.resetArm
+         ? '<span class="confirm">Wirklich den gesamten Lernfortschritt löschen? <button class="btn small" data-act="reset-yes">Ja, löschen</button><button class="btn small ghost" data-act="reset-no">Abbrechen</button></span>'
+         : '<button class="btn small ghost" data-act="reset">Fortschritt zurücksetzen</button>') + '</div></section>';
+  return h + "</div>";
+}
+function stat(v, l){ return '<div class="card stat"><span class="v">' + v + '</span><span class="l">' + l + '</span></div>'; }
+function weakList(){
+  const agg = {};
+  for (const q of QS) { const e = S.prog[q.id]; if (!e) continue; const k = q.lf + "|" + q.t; const a = agg[k] || (agg[k] = {lf: q.lf, t: q.t, c: 0, w: 0, low: 0}); a.c += e.c || 0; a.w += e.w || 0; if ((e.b || 0) < 2) a.low++; }
+  const rows = Object.values(agg).filter(a => a.w > 0).map(a => Object.assign(a, {r: a.w / Math.max(1, a.c + a.w)})).sort((x, y) => y.r - x.r || y.w - x.w).slice(0, 5);
+  if (!rows.length) return '<div class="card empty"><p class="muted">Noch keine Schwachstellen erkannt. Sobald du Fragen falsch beantwortest, tauchen die Themen hier auf.</p><button class="btn primary" data-act="quick" data-lf="0">10 gemischte Fragen starten</button></div>';
+  return '<div class="card weak">' + rows.map(a => '<div class="weak-row"><div><span class="tag">LF ' + a.lf + '</span> <b>' + esc(a.t) + '</b></div><div class="btn-row"><span class="rate">' + Math.round(a.r * 100) + ' % falsch</span><button class="btn small" data-act="quick" data-lf="' + a.lf + '" data-t="' + esc(a.t) + '">Üben</button></div></div>').join("") + '</div>';
+}
+
+function filtered(){
+  const p = S.pick;
+  return QS.filter(q => (!p.lf || q.lf === p.lf) && (!p.topic || q.t === p.topic) &&
+    (p.kind === "all" || (p.kind === "calc" && (q.y === "num" || q.y === "text")) || (p.kind === "choice" && (q.y === "mc" || q.y === "multi")) || (p.kind === "open" && q.y === "open")));
+}
+function vLernen(){
+  if (S.session && S.session.mode === "learn") return vSession();
+  const p = S.pick, list = filtered();
+  let h = '<div class="stack"><div><p class="eyebrow">Lernen</p><h2 style="margin-top:4px">Was willst du üben?</h2></div><section class="card picker">';
+  h += '<div><p class="lbl">Lernfeld</p><div class="chips">' + [0,1,2,3,4,5,6].map(n => '<button class="chip" data-act="pick-lf" data-lf="' + n + '" aria-pressed="' + (p.lf === n) + '">' + (n ? "LF 0" + n + " · " + esc((LFS[n] || {}).kurz || "") : "Alle Lernfelder") + '</button>').join("") + '</div></div>';
+  if (p.lf) h += '<div><p class="lbl">Thema</p><div class="chips">' + ['', ...topicsOf(p.lf)].map(t => { const c = QS.filter(q => q.lf === p.lf && (!t || q.t === t)).length; return '<button class="chip" data-act="pick-t" data-t="' + esc(t) + '" aria-pressed="' + (p.topic === t) + '">' + (t ? esc(t) : "Alle Themen") + ' <span class="n">' + c + '</span></button>'; }).join("") + '</div></div>';
+  h += '<div><p class="lbl">Aufgabenart</p><div class="chips">' + [["all","Alle"],["calc","Rechnen & Eingabe"],["choice","Ankreuzen"],["open","Offene Aufgaben"]].map(([k, l]) => '<button class="chip" data-act="pick-k" data-k="' + k + '" aria-pressed="' + (p.kind === k) + '">' + l + '</button>').join("") + '</div></div>';
+  h += '<div class="btn-row"><button class="btn primary" data-act="start" data-n="10"' + (list.length ? "" : " disabled") + '>' + Math.min(10, list.length) + ' Fragen starten</button>' +
+       (list.length > 10 ? '<button class="btn" data-act="start" data-n="all">Alle ' + list.length + ' Fragen</button>' : "") +
+       '<span class="muted" style="font-size:.85rem">Unbekannte und wackelige Fragen kommen zuerst.</span></div>';
+  return h + '</section></div>';
+}
+function startSession(ids, mode, label){
+  if (!ids.length) return;
+  S.session = {ids, i: 0, mode, label, sel: null, phase: "ask", ok: null, res: {}};
+  go(mode === "review" ? "wiederholen" : "lernen");
+}
+function learnOrder(qs){ return shuffle(qs.map(q => q.id)).sort((a, b) => box(a) - box(b)); }
+
+function vSession(){
+  const s = S.session;
+  if (s.i >= s.ids.length) return vSummary();
+  const q = BY[s.ids[s.i]];
+  return '<div class="stack"><div><div class="sess-head"><p class="eyebrow">' + esc(s.label) + ' · <span class="mono">' + (s.i + 1) + ' / ' + s.ids.length + '</span></p><button class="btn small ghost" data-act="end">Runde beenden</button></div>' +
+         '<div class="bar"><span style="width:' + Math.round(s.i / s.ids.length * 100) + '%"></span></div></div>' +
+         qCard(q, s.sel, s.phase, "learn") + '</div>';
+}
+function qCard(q, sel, phase, ctx){
+  const shown = phase === "shown";
+  let h = '<article class="card q"><p class="q-meta"><span class="tag">LF 0' + q.lf + '</span><span>' + esc(q.t) + '</span><span>·</span><span>' + TYPE_LABEL[q.y] + '</span></p>';
+  h += '<div class="q-text">' + q.q + '</div>';
+  if (q.y === "mc" || q.y === "multi") {
+    if (q.y === "multi") h += '<p class="hint">Mehrere Antworten können richtig sein.</p>';
+    h += '<div class="opts">' + q.o.map((o, i) => {
+      const on = q.y === "mc" ? sel === i : Array.isArray(sel) && sel.includes(i);
+      const right = q.y === "mc" ? q.a === i : q.a.includes(i);
+      let cls = "opt" + (q.y === "multi" ? " multi" : "");
+      if (shown && right) cls += " is-right"; else if (shown && on) cls += " is-wrong";
+      return '<button class="' + cls + '" data-act="sel" data-i="' + i + '" aria-pressed="' + on + '"' + (shown ? " disabled" : "") + '><span class="key">' + "ABCDEF"[i] + '</span><span>' + o + '</span></button>';
+    }).join("") + '</div>';
+  } else if (q.y === "num" || q.y === "text") {
+    h += '<div class="field"><input id="ans" type="text" ' + (q.y === "num" ? 'inputmode="decimal" ' : "") + 'autocomplete="off" spellcheck="false" placeholder="' + (q.y === "num" ? "Ergebnis" : "Antwort") + '" aria-label="Deine Antwort" value="' + esc(sel || "") + '"' + (shown ? " disabled" : "") + '>' + (q.u ? '<span class="unit">' + esc(q.u) + '</span>' : "") + '</div>';
+    h += '<p class="hint">' + (q.h ? esc(q.h) + " · " : "") + (q.y === "num" ? "Komma oder Punkt sind beide in Ordnung, die Einheit musst du nicht eintippen." : "Groß- und Kleinschreibung sowie Leerzeichen sind egal.") + '</p>';
+  } else if (q.y === "open") {
+    h += '<div class="field"><textarea id="ans" placeholder="Deine Antwort in Stichpunkten" aria-label="Deine Antwort"' + (shown && ctx !== "exam" ? " disabled" : "") + '>' + esc(sel || "") + '</textarea></div>';
+  }
+  if (ctx === "exam") return h + "</article>";
+  if (shown) {
+    if (q.y === "open") {
+      h += '<div class="fb info"><p class="fb-title">Musterlösung</p><div class="expl">' + q.a + '</div></div>';
+      h += '<div class="q-actions"><span class="hint">Wie gut war deine Antwort?</span><div class="btn-row"><button class="btn" data-act="rate" data-r="bad">Nicht gewusst</button><button class="btn" data-act="rate" data-r="part">Teilweise</button><button class="btn primary" data-act="rate" data-r="ok">Gewusst</button></div></div>';
+    } else {
+      const ok = S.session.ok;
+      h += '<div class="fb ' + (ok ? "ok" : "bad") + '"><p class="fb-title">' + (ok ? "✓ Richtig" : "✗ Nicht richtig") + '<span style="font-weight:400;color:var(--ink)"> · ' + solutionLine(q) + '</span></p><div class="expl">' + (q.e || "") + '</div></div>';
+      h += '<div class="q-actions"><span class="kbd">Enter = weiter</span><button class="btn primary" data-act="next" id="next-btn">Weiter</button></div>';
+    }
+  } else {
+    const can = hasAnswer(q, sel);
+    h += '<div class="q-actions"><span class="kbd">' + (q.y === "mc" || q.y === "multi" ? "Tasten 1–" + q.o.length + " wählen · " : "") + 'Enter = prüfen</span>' +
+         (q.y === "open" ? '<button class="btn primary" data-act="reveal">Lösung zeigen</button>' : '<button class="btn primary" data-act="check" id="check-btn"' + (can ? "" : " disabled") + '>Prüfen</button>') + '</div>';
+  }
+  return h + "</article>";
+}
+function vSummary(){
+  const s = S.session, ids = s.ids;
+  const right = ids.filter(id => s.res[id] === "ok").length;
+  const wrong = ids.filter(id => s.res[id] !== "ok");
+  let h = '<div class="stack"><section class="card result"><div><p class="eyebrow">Runde geschafft</p><p class="score" style="margin-top:6px">' + right + '<span class="muted" style="font-size:1.6rem"> / ' + ids.length + '</span></p></div>' +
+          '<div><p>' + (right === ids.length ? "Alles richtig. Diese Fragen kommen erst in ein paar Tagen wieder." : wrong.length + " Fragen sitzen noch nicht. Sie landen wieder im ersten Fach und kommen bald erneut.") + '</p>' +
+          '<div class="btn-row" style="margin-top:14px">' + (wrong.length ? '<button class="btn primary" data-act="again-wrong">Falsche nochmal (' + wrong.length + ')</button>' : "") +
+          '<button class="btn" data-act="new-round">Neue Runde</button><button class="btn ghost" data-act="go-home">Zur Übersicht</button></div></div></section>';
+  if (wrong.length) h += '<section class="card review">' + wrong.map(id => { const q = BY[id]; return '<details><summary><span class="mark ' + (s.res[id] === "part" ? "part" : "bad") + '">' + (s.res[id] === "part" ? "½" : "✗") + '</span><span>' + esc(strip(q.q).slice(0, 140)) + '</span></summary><div class="body"><p>' + solutionLine(q) + '</p><div class="expl">' + (q.y === "open" ? q.a : q.e || "") + '</div></div></details>'; }).join("") + '</section>';
+  return h + '</div>';
+}
+
+function vWiederholen(){
+  if (S.session && S.session.mode === "review") return vSession();
+  const due = dueIds(), counts = [0,0,0,0,0,0]; let fresh = 0;
+  for (const q of QS) { const e = S.prog[q.id]; if (!e) fresh++; else counts[Math.min(5, e.b || 0)]++; }
+  let h = '<div class="stack"><div><p class="eyebrow">Wiederholen</p><h2 style="margin-top:4px">Dein Karteikasten</h2><p class="muted" style="margin-top:8px;max-width:62ch">Jede richtige Antwort schiebt eine Frage ein Fach weiter. Sie kommt dann nach 1, 2, 4, 8 oder 16 Tagen wieder. Bei einer falschen Antwort geht sie zurück ins erste Fach und kommt noch heute wieder.</p></div>';
+  h += '<div class="boxes">' + counts.map((c, i) => '<div class="box' + (c ? " fill" : "") + '"><div class="v">' + c + '</div><div class="l">' + (i === 0 ? "Fach 0 · heute" : "Fach " + i + " · " + INT[i] + " T.") + '</div></div>').join("") + '</div>';
+  h += '<p class="muted" style="font-size:.85rem">' + fresh + ' Fragen hast du noch nie gesehen.</p>';
+  if (due.length) h += '<section class="card empty"><h3>' + due.length + ' Fragen sind heute fällig</h3><button class="btn primary" data-act="review">Jetzt ' + Math.min(20, due.length) + ' wiederholen</button></section>';
+  else h += '<section class="card empty"><h3>Heute ist nichts fällig</h3><p class="muted">Lerne ein paar neue Fragen, dann füllt sich der Kasten.</p><button class="btn primary" data-act="fresh"' + (fresh ? "" : " disabled") + '>10 neue Fragen lernen</button></section>';
+  return h + '</div>';
+}
+
+/* ───────── Prüfungssimulation ───────── */
+const PLAN = {1:3, 2:7, 3:4, 4:4, 5:3, 6:4};
+function buildExam(){
+  const ids = []; let opens = 0;
+  for (const [lf, n] of Object.entries(PLAN)) {
+    const pool = shuffle(QS.filter(q => q.lf === +lf)); let k = 0;
+    for (const q of pool) { if (k >= n) break; if (q.y === "open") { if (opens >= 3) continue; opens++; } ids.push(q.id); k++; }
+  }
+  return ids;
+}
+function ihkNote(p){ return p >= 92 ? [1,"sehr gut"] : p >= 81 ? [2,"gut"] : p >= 67 ? [3,"befriedigend"] : p >= 50 ? [4,"ausreichend"] : p >= 30 ? [5,"mangelhaft"] : [6,"ungenügend"]; }
+const NOTE_TABLE = '<div class="table-wrap"><table class="grade-table"><thead><tr><th>Punkte</th><th>Note</th></tr></thead><tbody>' +
+  [["100–92","1 · sehr gut"],["91–81","2 · gut"],["80–67","3 · befriedigend"],["66–50","4 · ausreichend"],["49–30","5 · mangelhaft"],["29–0","6 · ungenügend"]].map(r => '<tr><td class="mono">' + r[0] + '</td><td>' + r[1] + '</td></tr>').join("") + '</tbody></table></div>';
+function examPoints(id){ const q = BY[id], ex = S.exam; return q.y === "open" ? (ex.grades[id] || 0) : isCorrect(q, ex.ans[id]) ? 4 : 0; }
+
+function vPruefung(){
+  const ex = S.exam;
+  if (!ex) {
+    return '<div class="stack"><div><p class="eyebrow">Prüfungssimulation</p><h2 style="margin-top:4px">90 Minuten, 25 Aufgaben, 100 Punkte</h2></div>' +
+      '<section class="card picker"><p style="max-width:64ch">Die Aufgaben kommen aus allen sechs Lernfeldern, gewichtet wie im Unterricht (LF02 am stärksten). Jede Aufgabe zählt 4 Punkte. Lösungen siehst du erst nach der Abgabe. Offene Aufgaben bewertest du am Ende selbst mit der Musterlösung: 4, 2 oder 0 Punkte.</p>' +
+      '<p class="muted" style="font-size:.9rem;max-width:64ch">Die echte AP1 besteht aus wenigen großen Aufgaben mit Teilaufgaben rund um ein Fallbeispiel. Die Simulation trainiert Tempo und Breite. Original-Altklausuren findest du im Moodle-Kurs LF06.</p>' +
+      NOTE_TABLE + '<div class="btn-row"><button class="btn primary" data-act="exam-start">Simulation starten</button><span class="kbd">Taschenrechner bereitlegen</span></div></section></div>';
+  }
+  if (ex.phase === "run") {
+    const id = ex.ids[ex.i], q = BY[id];
+    let h = '<div class="stack"><section class="card exam-bar"><div><p class="eyebrow">Aufgabe <span class="mono">' + (ex.i + 1) + ' / ' + ex.ids.length + '</span></p></div><span class="timer" id="timer">' + timerText() + '</span></section>';
+    h += '<div class="dots" aria-label="Aufgabenübersicht">' + ex.ids.map((x, i) => '<button class="dot' + (i === ex.i ? " cur" : hasAnswer(BY[x], ex.ans[x]) ? " done" : "") + '" data-act="exam-jump" data-i="' + i + '" aria-label="Aufgabe ' + (i + 1) + '">' + (i + 1) + '</button>').join("") + '</div>';
+    h += qCard(q, ex.ans[id], "ask", "exam");
+    h += '<div class="q-actions"><div class="btn-row"><button class="btn" data-act="exam-prev"' + (ex.i ? "" : " disabled") + '>← Zurück</button><button class="btn" data-act="exam-next"' + (ex.i < ex.ids.length - 1 ? "" : " disabled") + '>Weiter →</button></div>' +
+         (S.submitArm ? '<span class="confirm">' + ex.ids.filter(x => !hasAnswer(BY[x], ex.ans[x])).length + ' unbeantwortet. Wirklich abgeben? <button class="btn primary small" data-act="exam-submit-yes">Abgeben</button><button class="btn ghost small" data-act="exam-submit-no">Weiter bearbeiten</button></span>'
+                      : '<button class="btn primary" data-act="exam-submit">Abgeben</button>') + '</div>';
+    return h + '</div>';
+  }
+  if (ex.phase === "grade") {
+    const opens = ex.ids.filter(id => BY[id].y === "open");
+    let h = '<div class="stack"><div><p class="eyebrow">Selbstbewertung</p><h2 style="margin-top:4px">Offene Aufgaben bewerten</h2><p class="muted" style="margin-top:8px">Vergleiche deine Antwort mit der Musterlösung und vergib ehrlich 4, 2 oder 0 Punkte.</p></div>';
+    for (const id of opens) {
+      const q = BY[id], g = ex.grades[id];
+      h += '<article class="card q"><p class="q-meta"><span class="tag">LF 0' + q.lf + '</span><span>' + esc(q.t) + '</span></p><div class="q-text">' + q.q + '</div>' +
+           '<div class="fb info"><p class="fb-title">Deine Antwort</p><div class="expl" style="white-space:pre-wrap">' + (esc(ex.ans[id] || "") || '<i class="muted">keine Antwort</i>') + '</div></div>' +
+           '<div class="fb ok"><p class="fb-title">Musterlösung</p><div class="expl" style="color:var(--ink)">' + q.a + '</div></div>' +
+           '<div class="btn-row">' + [[4,"4 Punkte · vollständig"],[2,"2 Punkte · teilweise"],[0,"0 Punkte · daneben"]].map(([p, l]) => '<button class="chip" data-act="grade" data-id="' + id + '" data-p="' + p + '" aria-pressed="' + (g === p) + '">' + l + '</button>').join("") + '</div></article>';
+    }
+    const all = opens.every(id => ex.grades[id] != null);
+    return h + '<div class="btn-row"><button class="btn primary" data-act="exam-finish"' + (all ? "" : " disabled") + '>Auswertung anzeigen</button></div></div>';
+  }
+  const pts = ex.ids.reduce((s, id) => s + examPoints(id), 0), [n, nt] = ihkNote(pts);
+  const used = Math.round((ex.end - ex.start) / 60000);
+  let h = '<div class="stack"><section class="card result"><div><p class="eyebrow">Ergebnis</p><p class="score" style="margin-top:6px">' + pts + '<span class="muted" style="font-size:1.4rem"> / 100</span></p></div>' +
+          '<div><p class="note">Note ' + n + ' · ' + nt + '</p><p class="muted" style="margin-top:4px">' + used + ' von 90 Minuten genutzt · nach IHK-Notenschlüssel</p></div><div class="lf-bars">';
+  for (const lf of [1,2,3,4,5,6]) { const ids = ex.ids.filter(id => BY[id].lf === lf); if (!ids.length) continue; const p = ids.reduce((s, id) => s + examPoints(id), 0), m = ids.length * 4; h += '<div class="lf-bar"><span class="mono">LF 0' + lf + '</span><div class="meter"><span style="width:' + Math.round(p / m * 100) + '%"></span></div><span class="mono" style="text-align:right">' + p + '/' + m + '</span></div>'; }
+  h += '</div></section>';
+  const wrong = ex.ids.filter(id => examPoints(id) < 4);
+  h += '<div class="btn-row">' + (wrong.length ? '<button class="btn primary" data-act="exam-train">Fehler üben (' + wrong.length + ')</button>' : "") + '<button class="btn" data-act="exam-new">Neue Simulation</button></div>';
+  h += '<section class="card review">' + ex.ids.map((id, i) => {
+    const q = BY[id], p = examPoints(id), cls = p === 4 ? "ok" : p > 0 ? "part" : "bad";
+    const yours = q.y === "mc" ? (Number.isInteger(ex.ans[id]) ? "ABCDEF"[ex.ans[id]] : "–") : q.y === "multi" ? ((ex.ans[id] || []).map(x => "ABCDEF"[x]).join(", ") || "–") : esc(ex.ans[id] || "–");
+    return '<details><summary><span class="mark ' + cls + '">' + p + ' P.</span><span><b>' + (i + 1) + '.</b> ' + esc(strip(q.q).slice(0, 130)) + '</span></summary><div class="body">' +
+      (q.y === "mc" || q.y === "multi" ? '<ol type="A" style="margin:0;padding-left:1.4em">' + q.o.map(o => '<li>' + o + '</li>').join("") + '</ol>' : "") +
+      (q.y !== "open" ? '<p>Deine Antwort: <b class="mono">' + yours + '</b> · ' + solutionLine(q) + '</p><div class="expl">' + (q.e || "") + '</div>' : '<div class="expl">' + q.a + '</div>') + '</div></details>';
+  }).join("") + '</section>';
+  return h + '</div>';
+}
+let tick = null;
+function timerText(){
+  const ex = S.exam; if (!ex) return "";
+  const left = Math.max(0, ex.start + 90 * 60000 - Date.now()), m = Math.floor(left / 60000), s = Math.floor(left % 60000 / 1000);
+  return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+}
+function startTimer(){
+  clearInterval(tick);
+  tick = setInterval(() => {
+    const ex = S.exam; if (!ex || ex.phase !== "run") { clearInterval(tick); return; }
+    const el = $("#timer");
+    if (el) { el.textContent = timerText(); el.classList.toggle("low", ex.start + 90 * 60000 - Date.now() < 10 * 60000); }
+    if (Date.now() >= ex.start + 90 * 60000) submitExam();
+  }, 1000);
+}
+function submitExam(){
+  const ex = S.exam; ex.end = Math.min(Date.now(), ex.start + 90 * 60000); S.submitArm = false; clearInterval(tick);
+  ex.phase = ex.ids.some(id => BY[id].y === "open") ? "grade" : "done";
+  if (ex.phase === "done") finishExam(); else { render(); window.scrollTo({top: 0}); }
+}
+function finishExam(){
+  const ex = S.exam; ex.phase = "done";
+  for (const id of ex.ids) { const p = examPoints(id); record(id, p === 4 ? "ok" : p > 0 ? "part" : "bad"); }
+  render(); window.scrollTo({top: 0});
+}
+
+/* ───────── Formeln ───────── */
+function vFormeln(){
+  const fc = (t, body) => '<article class="card f-card"><h3>' + t + '</h3>' + body + '</article>';
+  const f = s => '<div class="f">' + s + '</div>';
+  const schema = rows => '<div class="schema">' + rows.map(([op, txt, res]) => '<span class="op">' + op + '</span><span' + (res ? ' class="res"' : "") + '>' + txt + '</span>').join("") + '</div>';
+  let h = '<div class="stack"><div><p class="eyebrow">Formelsammlung</p><h2 style="margin-top:4px">Alles, was du in der AP1 rechnen musst</h2></div><div class="f-grid">';
+  h += fc("Speichereinheiten", f("SI: 1 kB = 1.000 B · 1 MB = 10<sup>6</sup> B · 1 GB = 10<sup>9</sup> B") + f("IEC: 1 KiB = 1.024 B · 1 MiB = 2<sup>20</sup> B · 1 GiB = 2<sup>30</sup> B") + f("GB → GiB: × 10<sup>9</sup> ÷ 1024<sup>3</sup>") + '<p class="muted">Hersteller rechnen in SI, Windows in IEC (zeigt aber „GB“ an).</p>');
+  h += fc("Bild- und Videogröße", f("Pixel = (cm ÷ 2,54) × ppi") + f("Byte = Breite<sub>px</sub> × Höhe<sub>px</sub> × Bit ÷ 8") + f("Video = Bildgröße × fps × Sekunden") + '<p class="muted">RGB mit 8 Bit je Kanal = 24 Bit = 3 Byte pro Pixel.</p>');
+  h += fc("Datenübertragung", f("t = Datenmenge in Bit ÷ Datenrate in Bit/s") + f("Byte × 8 = Bit · 1 Mbit/s = 10<sup>6</sup> Bit/s") + '<p class="muted">Datenraten sind immer dezimal. Rechne die Dateigröße zuerst in Bit um.</p>');
+  h += fc("RAID-Nettokapazität", '<ul><li><b>RAID 0:</b> n × C · keine Redundanz · ab 2 Platten</li><li><b>RAID 1:</b> C (Spiegel) · 1 Ausfall · ab 2</li><li><b>RAID 5:</b> (n − 1) × C · 1 Ausfall · ab 3</li><li><b>RAID 6:</b> (n − 2) × C · 2 Ausfälle · ab 4</li><li><b>RAID 10:</b> n × C ÷ 2 · ab 4</li></ul><p class="muted">RAID ersetzt kein Backup (3-2-1-Regel).</p>');
+  h += fc("Elektrotechnik & Energie", f("P = U × I   ·   U = R × I") + f("E = P × t   (W × h = Wh; ÷ 1.000 = kWh)") + f("Kosten = kWh × Preis pro kWh") + f("Q = I × t   (Akku: mAh ÷ mA = h)") + f("η = P<sub>ab</sub> ÷ P<sub>zu</sub>") + '<p class="muted">Ein Jahr hat 8.760 Stunden (365 × 24).</p>');
+  h += fc("Betriebliche Kennzahlen", f("Produktivität = Output-Menge ÷ Input-Menge") + f("Wirtschaftlichkeit = Erträge ÷ Aufwendungen") + f("EK-Rentabilität = Gewinn ÷ EK × 100") + f("GK-Rentabilität = (Gewinn + FK-Zinsen) ÷ GK × 100") + f("Umsatzrentabilität = Gewinn ÷ Umsatz × 100"));
+  h += fc("Handelskalkulation (vorwärts)", schema([["","Listeneinkaufspreis"],["−","Liefererrabatt"],["=","Zieleinkaufspreis",1],["−","Liefererskonto"],["=","Bareinkaufspreis",1],["+","Bezugskosten"],["=","Einstandspreis (Bezugspreis)",1],["+","Handlungskosten (Zuschlag)"],["=","Selbstkosten",1],["+","Gewinnzuschlag"],["=","Barverkaufspreis",1],["+","Kundenskonto (im Hundert)"],["=","Zielverkaufspreis",1],["+","Kundenrabatt (im Hundert)"],["=","Listenverkaufspreis netto",1],["+","Umsatzsteuer 19 %"],["=","Listenverkaufspreis brutto",1]]) + '<p class="muted">„Im Hundert“: ÷ 0,98 statt × 1,02.</p>');
+  h += fc("Beschaffung & Finanzierung", f("Skonto-Jahreszins ≈ Skonto % × 360 ÷ (Ziel − Skontofrist)") + f("Nutzwert = Σ (Gewichtung × Punkte)") + '<p class="muted">Quantitativ: Bezugspreise vergleichen. Qualitativ: Nutzwertanalyse oder Präferenzmatrix.</p>');
+  h += fc("Verfügbarkeit & SLA", f("V = (Gesamtzeit − Ausfall) ÷ Gesamtzeit × 100") + f("V = MTBF ÷ (MTBF + MTTR)") + f("max. Ausfall = Gesamtzeit × (1 − V)") + '<p class="muted">99,9 % ≈ 8,76 h pro Jahr · 99,99 % ≈ 52,6 min pro Jahr.</p>');
+  h += fc("Kosten & Amortisation", f("Amortisation = Investition ÷ jährlicher Rückfluss") + f("Rückfluss = Einsparung − laufende Kosten") + f("Break-even: Fixkosten A ÷ Kosten je Einheit B") + '<p class="muted">Bei „ab wie vielen …“ immer aufrunden.</p>');
+  h += fc("IPv4-Subnetting", f("Hosts = 2<sup>(32 − Präfix)</sup> − 2") + f("Subnetze = 2<sup>geliehene Bits</sup>") + f("Blockgröße = 256 − Maskenoktett") + '<p class="muted">128 · 192 · 224 · 240 · 248 · 252 · 254 · 255 entsprechen /25 bis /32 im letzten Oktett. Privat: 10/8 · 172.16/12 · 192.168/16.</p>');
+  h += fc("Ports & IPv6", '<ul><li>HTTP 80 · HTTPS 443 · SSH 22 · DNS 53</li><li>SMTP 25/587 · IMAPS 993 · POP3 110</li><li>DHCP 67/68 · RDP 3389 · FTP 20/21</li></ul>' + f("IPv6: 128 Bit · führende Nullen weg · :: nur einmal") + '<p class="muted">fe80::/10 link-local · 2000::/3 global · ::1 Loopback.</p>');
+  h += fc("Netzplan", f("FEZ = FAZ + Dauer") + f("SAZ = SEZ − Dauer") + f("Gesamtpuffer = SAZ − FAZ") + f("Freier Puffer = FAZ Nachfolger − FEZ") + '<p class="muted">Kritischer Pfad: alle Vorgänge mit Gesamtpuffer 0.</p>');
+  h += fc("IHK-Notenschlüssel", NOTE_TABLE);
+  return h + '</div></div>';
+}
+
+/* ───────── Aktionen ───────── */
+const ACT = {
+  go: d => go(d.v),
+  "go-home": () => { S.session = null; go("uebersicht"); },
+  quick: d => {
+    const lf = +d.lf || 0, t = d.t || "";
+    S.pick = {lf, topic: t, kind: "all"};
+    const qs = QS.filter(q => (!lf || q.lf === lf) && (!t || q.t === t));
+    startSession(learnOrder(qs).slice(0, 10), "learn", (lf ? "LF 0" + lf : "Gemischt") + (t ? " · " + t : ""));
+  },
+  "pick-lf": d => { S.pick.lf = +d.lf; S.pick.topic = ""; render(); },
+  "pick-t": d => { S.pick.topic = d.t; render(); },
+  "pick-k": d => { S.pick.kind = d.k; render(); },
+  start: d => {
+    const qs = filtered(); const ids = learnOrder(qs); const p = S.pick;
+    startSession(d.n === "all" ? ids : ids.slice(0, 10), "learn", (p.lf ? "LF 0" + p.lf : "Alle Lernfelder") + (p.topic ? " · " + p.topic : ""));
+  },
+  review: () => { const t = Date.now(); const ids = dueIds().sort((a, b) => S.prog[a].d - S.prog[b].d).slice(0, 20); startSession(shuffle(ids), "review", "Wiederholung"); },
+  fresh: () => { const ids = shuffle(QS.filter(q => !S.prog[q.id]).map(q => q.id)).slice(0, 10); startSession(ids, "learn", "Neue Fragen"); },
+  end: () => { S.session.i = S.session.ids.length; if (!Object.keys(S.session.res).length) { S.session = null; } render(); },
+  sel: d => {
+    const s = S.exam && S.exam.phase === "run" && S.view === "pruefung" ? null : S.session;
+    const i = +d.i;
+    if (s) {
+      if (s.phase !== "ask") return;
+      const q = BY[s.ids[s.i]];
+      if (q.y === "mc") s.sel = i; else { const a = Array.isArray(s.sel) ? s.sel.slice() : []; const k = a.indexOf(i); k >= 0 ? a.splice(k, 1) : a.push(i); s.sel = a; }
+      render();
+    } else if (S.exam) {
+      const ex = S.exam, id = ex.ids[ex.i], q = BY[id];
+      if (q.y === "mc") ex.ans[id] = ex.ans[id] === i ? null : i; else { const a = Array.isArray(ex.ans[id]) ? ex.ans[id].slice() : []; const k = a.indexOf(i); k >= 0 ? a.splice(k, 1) : a.push(i); ex.ans[id] = a; }
+      render();
+    }
+  },
+  check: () => {
+    const s = S.session; if (!s || s.phase !== "ask") return;
+    const q = BY[s.ids[s.i]]; const inp = $("#ans"); if (inp) s.sel = inp.value;
+    if (!hasAnswer(q, s.sel)) return;
+    s.ok = isCorrect(q, s.sel); s.phase = "shown"; s.res[q.id] = s.ok ? "ok" : "bad"; record(q.id, s.ok ? "ok" : "bad");
+    render(); const nb = $("#next-btn"); if (nb) nb.focus({preventScroll: true});
+  },
+  reveal: () => { const s = S.session; const inp = $("#ans"); if (inp) s.sel = inp.value; s.phase = "shown"; render(); },
+  rate: d => { const s = S.session, id = s.ids[s.i]; s.res[id] = d.r; record(id, d.r); ACT.next(); },
+  next: () => { const s = S.session; if (!s) return; s.i++; s.sel = null; s.phase = "ask"; s.ok = null; render(); window.scrollTo({top: 0}); },
+  "again-wrong": () => { const s = S.session; const ids = s.ids.filter(id => s.res[id] !== "ok"); startSession(shuffle(ids), s.mode, s.label + " · Wiederholung"); },
+  "new-round": () => { const m = S.session.mode; S.session = null; if (m === "review") go("wiederholen"); else ACT.start({n: "10"}); },
+  reset: () => { S.resetArm = true; render(); },
+  "reset-no": () => { S.resetArm = false; render(); },
+  "reset-yes": () => { S.prog = {}; S.resetArm = false; save(); if (cloud.ref) flush(); render(); },
+  "exam-start": () => { S.exam = {ids: buildExam(), i: 0, ans: {}, grades: {}, start: Date.now(), phase: "run"}; S.submitArm = false; render(); startTimer(); window.scrollTo({top: 0}); },
+  "exam-jump": d => { S.exam.i = +d.i; S.submitArm = false; render(); },
+  "exam-prev": () => { if (S.exam.i > 0) { S.exam.i--; render(); } },
+  "exam-next": () => { if (S.exam.i < S.exam.ids.length - 1) { S.exam.i++; render(); } },
+  "exam-submit": () => { S.submitArm = true; render(); },
+  "exam-submit-no": () => { S.submitArm = false; render(); },
+  "exam-submit-yes": () => submitExam(),
+  grade: d => { S.exam.grades[d.id] = +d.p; render(); },
+  "exam-finish": () => finishExam(),
+  "exam-new": () => { S.exam = null; render(); },
+  "exam-train": () => { const ex = S.exam; const ids = ex.ids.filter(id => examPoints(id) < 4); S.exam = null; startSession(shuffle(ids), "learn", "Fehler aus der Simulation"); }
+};
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b || b.disabled) return;
+  const fn = ACT[b.dataset.act]; if (fn) { e.preventDefault(); fn(b.dataset, b); }
+});
+document.addEventListener("input", e => {
+  const t = e.target;
+  if (t.id === "ans") {
+    if (S.view === "pruefung" && S.exam && S.exam.phase === "run") {
+      const ex = S.exam, id = ex.ids[ex.i]; ex.ans[id] = t.value;
+      const dot = document.querySelectorAll(".dot")[ex.i]; if (dot) dot.classList.toggle("done", t.value.trim() !== "");
+    } else if (S.session) {
+      S.session.sel = t.value; const b = $("#check-btn"); if (b) b.disabled = !t.value.trim();
+    }
+  }
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "exam-date" && e.target.value) { S.examDate = e.target.value; save(); renderTop(); const h = $(".hero h1"); if (h) render(); }
+});
+document.addEventListener("keydown", e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const tag = (e.target.tagName || "").toLowerCase();
+  const inLearn = S.session && ((S.view === "lernen" && S.session.mode === "learn") || (S.view === "wiederholen" && S.session.mode === "review")) && S.session.i < S.session.ids.length;
+  const inExam = S.view === "pruefung" && S.exam && S.exam.phase === "run";
+  if (!inLearn && !inExam) return;
+  const q = inLearn ? BY[S.session.ids[S.session.i]] : BY[S.exam.ids[S.exam.i]];
+  if (/^[1-6]$/.test(e.key) && tag !== "input" && tag !== "textarea" && q.o && +e.key <= q.o.length) {
+    if (inLearn && S.session.phase !== "ask") return;
+    e.preventDefault(); ACT.sel({i: String(+e.key - 1)}); return;
+  }
+  if (e.key === "Enter" && !e.shiftKey && tag !== "textarea" && inLearn) {
+    if (tag === "button" && e.target.dataset.act) return;
+    e.preventDefault();
+    const s = S.session;
+    if (s.phase === "ask") { if (q.y === "open") ACT.reveal(); else ACT.check(); }
+    else if (q.y !== "open") ACT.next();
+  }
+});
+
+/* ───────── Start ───────── */
+loadLocal();
+const h0 = (location.hash || "").slice(1);
+if (VIEWS.includes(h0)) S.view = h0;
+if (!QS.length) { $("#app").innerHTML = '<div class="card empty"><h3>Die Fragen konnten nicht geladen werden</h3><p class="muted">Lade die Seite neu. Wenn das nicht hilft, ist die Datei fragen.js nicht erreichbar.</p></div>'; }
+else render();
+setTimeout(initCloud, 0);
+})();
+</script>
+</body>
+</html>
